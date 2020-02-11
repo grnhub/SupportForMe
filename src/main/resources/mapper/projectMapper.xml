@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project">
+	<!-- 검색 무한스크롤, 분야별 전체결과 무한스크롤 -->
+	<select id="getProjects" resultType="project"
+		parameterType="com.supportforme.biz.project.ProjectSearchDTO">
+		<!-- SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM (
+			SELECT DISTINCT p.project_no, p.support_pick_yn , p.delivery_date , p.category_code, p.project_name , p.image, TO_CHAR( p.target_amount , '999,999,999,999,999') "target_amount", p.project_deadline , p.progress , p.user_id 
+			,PROJECT_PROGRESS_RATE(p.project_no) "percent"
+			,TO_CHAR( FUNC_TOTAL_INVSET_AMOUNT(p.project_no) , '999,999,999,999,999') "totalInvest"
+			FROM project p -->
+		 SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM ( 
+         	SELECT DISTINCT p.project_no, p.support_pick_yn , p.delivery_date , p.category_code, p.project_name , p.image, TO_CHAR( p.target_amount , '999,999,999,999,999') "target_amount", p.project_deadline , p.user_id,  p.progress "progress_cd", c.code_name "progress"  
+         	,PROJECT_PROGRESS_RATE(p.project_no) "percent"
+         	,TO_CHAR( FUNC_TOTAL_INVEST_AMOUNT(p.project_no) , '999,999,999,999,999') "totalInvest"
+         	, CEIL(to_date(p.project_deadline,'yyyy.MM.dd') -  sysdate ) "remaindate"
+         	FROM project p JOIN common_code c ON (p.progress = c.code) 
+		<if test="searchKeyword != null and searchKeyword != '' ">
+			LEFT OUTER JOIN hashtag h
+			ON (p.project_no = h.project_no)
+		</if>
+		<where>
+		
+			<if test="searchKeyword == null or searchKeyword == '' ">
+			1 = 0
+			</if>
+			<if test="searchKeyword != null and searchKeyword != '' ">
+			<!-- (h.hashtag_name like '%' || #{searchKeyword, jdbcType=VARCHAR} || '%' -->
+				OR (h.hashtag_name = #{searchKeyword, jdbcType=VARCHAR} 
+					OR  replace(p.project_name,' ','')  like '%' || #{searchKeyword, jdbcType=VARCHAR} ||	'%'
+					OR  p.project_name like '%' || #{searchKeyword, jdbcType=VARCHAR} ||	'%') AND p.progress NOT IN('004','005')  and c.code_group = 'C03'
+			</if>
+			<if test="searchCondition != null and searchCondition != '' ">
+				OR p.category_code = #{searchCondition} AND p.progress IN('001') and c.code_group = 'C03'
+			</if>
+			<if test="projectNo != null and projectNo != '' ">
+				<![CDATA[ 
+				and p.project_no < #{projectNo}
+				]]>
+			</if>
+		</where>
+		ORDER BY p.project_no desc
+		) A )WHERE rnum BETWEEN #{start} AND #{end}
+	</select>
+
+	<!-- 검색한 프로젝트 건수 조회, 분야별 건수 조회 -->
+	<select id="getCnt" resultType="int"
+		parameterType="com.supportforme.biz.project.ProjectSearchDTO">
+		
+			 SELECT COUNT(DISTINCT P.PROJECT_NO) FROM PROJECT p  
+			 LEFT OUTER JOIN hashtag h ON (p.project_no = h.project_no)
+		<where>
+			<if test="searchKeyword == null or searchKeyword == '' ">
+				1 = 0	
+			</if>
+			<if test="searchKeyword != null and searchKeyword != '' ">
+				OR ( replace(p.project_name,' ','') like '%' || #{searchKeyword, jdbcType=VARCHAR} || '%'
+					OR p.project_name like '%' || #{searchKeyword, jdbcType=VARCHAR} || '%'
+				<!-- h.hashtag_name like '%' || #{searchKeyword, jdbcType=VARCHAR} || '%') -->
+				OR 	h.hashtag_name = #{searchKeyword, jdbcType=VARCHAR} )
+				AND p.progress NOT IN('004','005')
+			</if>
+			<if test="searchCondition != null and searchCondition != '' ">
+				OR p.category_code = #{searchCondition} AND p.progress IN('001')
+			</if>
+		</where>	
+		
+	</select>
+	<!-- 최신프로젝트 5개  -->
+	<select id="getLatestProjects" resultType="project">
+		SELECT p.*
+		FROM ( SELECT *
+			   FROM project
+			   ORDER BY project_no desc ) p
+		<where>		
+				<![CDATA[
+				progress ='001' AND rownum <= 5
+				]]>
+		</where>
+	</select>
+	
+	<!-- 공연 조회 -->
+	<select id="getPerformanceProjects" resultType="project">
+		SELECT p.project_no, p.support_pick_yn , p.delivery_date , p.category_code, p.project_name , p.image, TO_CHAR( p.target_amount , '999,999,999,999,999') "target_amount", p.project_deadline , p.progress , p.user_id
+		,PROJECT_PROGRESS_RATE(p.project_no) "percent"
+		,TO_CHAR( FUNC_TOTAL_INVEST_AMOUNT(p.project_no) , '999,999,999,999,999') "totalInvest"
+		,p.project_deadline
+		FROM ( SELECT *
+		FROM project
+		ORDER BY DBMS_RANDOM.RANDOM ) p
+		<where>		
+				<![CDATA[
+				progress ='001' AND
+				category_code ='001' AND rownum < 5
+				]]>
+		</where>
+	</select>
+	<!-- 미술 조회 -->
+	<select id="getArtProjects" resultType="project">
+		SELECT p.project_no, p.support_pick_yn , p.delivery_date , p.category_code, p.project_name , p.image, TO_CHAR( p.target_amount , '999,999,999,999,999') "target_amount", p.project_deadline , p.progress , p.user_id
+		,PROJECT_PROGRESS_RATE(p.project_no) "percent"
+		,TO_CHAR( FUNC_TOTAL_INVEST_AMOUNT(p.project_no) , '999,999,999,999,999') "totalInvest"
+		FROM ( SELECT *
+		FROM project
+		ORDER BY DBMS_RANDOM.RANDOM ) p
+		
+		<!-- progress name
+		  SELECT p.project_no, p.support_pick_yn , p.delivery_date , p.category_code, p.project_name , p.image, TO_CHAR( p.target_amount , '999,999,999,999,999') "target_amount", p.project_deadline , code_name "progress" , p.user_id
+		,PROJECT_PROGRESS_RATE(p.project_no) "percent"
+		,TO_CHAR( FUNC_TOTAL_INVSET_AMOUNT(p.project_no) , '999,999,999,999,999') "totalInvest"
+		FROM ( SELECT *
+           FROM project p join common_code c on (p.progress = c.code)
+           where code_group = 'C03'
+           ORDER BY DBMS_RANDOM.RANDOM
+         ) p -->
+		<where>
+				<![CDATA[
+				progress ='001' AND
+				category_code ='003' AND rownum < 5		
+				]]>
+		</where>
+	</select>
+	<!-- 도서 조회 -->
+	<select id="getBookProjects" resultType="project">
+		SELECT p.project_no, p.support_pick_yn , p.delivery_date , p.category_code, p.project_name , p.image, TO_CHAR( p.target_amount , '999,999,999,999,999') "target_amount", p.project_deadline , p.progress , p.user_id
+		,PROJECT_PROGRESS_RATE(p.project_no) "percent"
+		,TO_CHAR( FUNC_TOTAL_INVEST_AMOUNT(p.project_no) , '999,999,999,999,999') "totalInvest"
+		FROM ( SELECT *
+		FROM project
+		ORDER BY DBMS_RANDOM.RANDOM ) p
+		<where>
+				<![CDATA[
+				progress ='001' AND
+				category_code ='004' AND rownum < 5		
+				]]>
+		</where>
+	</select>
+	<!-- 영화 조회 -->
+	<select id="getMovieProjects" resultType="project">
+		SELECT p.project_no, p.support_pick_yn , p.delivery_date , p.category_code, p.project_name , p.image, TO_CHAR( p.target_amount , '999,999,999,999,999') "target_amount", p.project_deadline , p.progress , p.user_id
+		,PROJECT_PROGRESS_RATE(p.project_no) "percent"
+		,TO_CHAR( FUNC_TOTAL_INVEST_AMOUNT(p.project_no) , '999,999,999,999,999') "totalInvest"
+		FROM ( SELECT *
+		FROM project
+		ORDER BY DBMS_RANDOM.RANDOM ) p
+		<where>
+				<![CDATA[
+				progress ='001' AND
+				category_code ='002' AND rownum < 5		
+				]]>
+		</where>
+	</select>
+
+	<!-- 실시간랭킹 조회 -->
+	<select id="getInvsetTop5" resultType="project">
+		<![CDATA[	
+				SELECT project_no, project_name, image
+				FROM (   select i.project_no, count(*) as count ,p.project_name, p.image
+    	  	      	from invest i JOIN project p on( i.PROJECT_NO = p.project_no)
+    	  	      	where p.progress ='001' 
+     		      	group by i.project_no, p.project_name, p.image
+	      	    	order by count desc, project_no desc)
+		 		WHERE rownum <=5 
+		 		]]>
+	</select>
+	<!-- 서포미픽 조회 -->
+	<select id="getSupportForMePicks" resultType="project">
+		<![CDATA[	
+		SELECT project_no, project_name, image, category_code
+ 		FROM project 
+  		WHERE rownum <=5 AND support_pick_yn = 'Y' AND progress ='001' 
+  		ORDER BY DBMS_RANDOM.RANDOM
+		 		]]>
+	</select>
+	<!-- 나의 프로젝트 조회 -->
+	<select id="getMyProjects" resultType="project">
+			 SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM ( 
+         	SELECT DISTINCT p.project_no, p.support_pick_yn , p.delivery_date , p.category_code, p.project_name , p.image, TO_CHAR( p.target_amount , '999,999,999,999,999') "target_amount", p.project_deadline , p.user_id, p.progress "progress_cd", c.code_name "progress"  
+         	,PROJECT_PROGRESS_RATE(p.project_no) "percent"
+         	,TO_CHAR( FUNC_TOTAL_INVEST_AMOUNT(p.project_no) , '999,999,999,999,999') "totalInvest"
+         	FROM project p JOIN common_code c ON (p.progress = c.code) 
+	
+  		<where>
+  				USER_ID = #{userId} and c.code_group = 'C03'
+  				<if test="projectNo != null and projectNo != '' ">
+				<![CDATA[ 
+				and p.project_no < #{projectNo}
+				]]>
+			</if>
+  		</where> 	 		
+		ORDER BY p.project_no desc
+		) A )WHERE rnum BETWEEN #{start} AND #{end}
+	</select>
+	<!-- 프로젝트 삭제 -->
+	<delete id="deleteProject" parameterType="project">
+		<!-- DELETE FROM PROJECT
+		WHERE  project_no = #{projectNo} -->
+	{call 
+     declare 
+     begin 
+      DELETE FROM HASHTAG WHERE project_no = #{projectNo}; 
+      DELETE FROM PRESENT WHERE project_no = #{projectNo}; 
+      DELETE FROM PROJECT WHERE project_no = #{projectNo}; 
+     end 
+    } 
+ 	</delete>
+</mapper> 

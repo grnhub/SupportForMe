@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="present">
+	
+	<!-- 선물 다건 조회  -->
+	<select id="getPresents" resultType="present" parameterType="present">
+		SELECT * FROM PRESENT WHERE PROJECT_NO = #{projectNo} ORDER BY PRESENT_PRICE
+	</select>
+	
+	<!-- 선물 단건 조회  -->
+	<select id="getPresent" resultType="present" parameterType="present">
+		SELECT * FROM PRESENT WHERE PRESENT_NO = #{presentNo}
+	</select>
+	
+	<!-- 선물 등록  -->
+	<insert id="insertPresent" parameterType="present">
+		<selectKey keyProperty="presentNo" resultType="string" order="BEFORE">
+		  SELECT (TO_CHAR(SYSDATE, 'rrrrMMdd') || LPAD((PRESENT_SEQ.NEXTVAL),4,0)) FROM DUAL
+		</selectKey>
+		INSERT INTO PRESENT
+		(PRESENT_NO, PRESENT_PRICE, PRESENT_NAME, PRESENT_DELIVERY_DATE, PROJECT_NO)
+		 VALUES 
+		 (#{presentNo},
+		  #{presentPrice},
+		  #{presentName},
+		  #{presentDeliveryDate},
+		  #{projectNo})
+	
+	</insert>
+	
+	<!-- 선물 수정  -->
+	<update id="updatePresent" parameterType="present">
+		 UPDATE PRESENT
+		 SET
+		 PRESENT_PRICE = #{presentPrice},
+		 PRESENT_NAME = #{presentName},
+		 PRESENT_DELIVERY_DATE = #{presentDeliveryDate}
+		 WHERE  PRESENT_NO = #{presentNo}
+	</update>
+	
+	<!-- 선물 삭제 -->
+	<delete id="deletePresent" parameterType="present">
+		DELETE FROM PRESENT
+		WHERE PRESENT_NO = #{presentNo}
+	</delete>
+	
+</mapper> 

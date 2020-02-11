@@ -1,0 +1,244 @@
+@charset "UTF-8";
+
+.pjdtl-bodysize {
+	margin-left: auto;
+	margin-right: auto;
+	width: 1100px;
+}
+
+.pjdtl-center {
+	text-align: center;
+}
+
+.pjdtl-flex-container {
+	display: flex;
+}
+
+.pjdtl-project-name {
+	width: 100%;
+	font-size: 45px;
+	text-align: center;
+	color:#353535;
+}
+
+.pjdtl-pick-btn {
+	display: flex;
+	flex: 0 0 auto;
+	width: 100px;
+	height: 40px;
+	font-size: 15px;
+	font-weight: 700;
+	border: 1px solid rgb(26, 188, 156);
+	border-radius: 7px;
+	padding: 5px;
+	margin-top:auto;
+	margin-bottom:auto;
+}
+.pickBtn-no {
+	background-color: white;
+	color: rgb(26, 188, 156);
+	padding-left: 30px;
+}
+.pickBtn-yes {
+	background-color: rgb(26, 188, 156);
+	color: white;
+	padding-left: 21px;
+}
+
+.pjdtl-hashtag {
+	color: rgb(26, 188, 156);
+	font-size: 25px;
+}
+.pjdtl-hashtag:hover {
+	cursor:pointer;
+	text-decoration:underline;
+}
+
+.pjdtl-intro-box {
+	width: 660px;
+	height: 430px;
+	border: 1px solid;
+	border-color: silver;
+}
+
+.pjdtl-empty-box {
+	width: 20px;
+	height: 430px;
+}
+
+.pjdtl-detail-box {
+	display: flex;
+	flex-direction: column;
+	width: 450px;
+	height: 480px;
+	margin-left:15px;
+}
+
+.pjdtl-target-price {
+	font-size: 33px;
+	color: #8C8C8C;
+}
+
+.pjdtl-invest-btn {
+	width: 480px;
+	height: 50px;
+	margin-right: 10px;
+	font-size: 20px;
+	font-weight: 800;
+	color: white;
+	background-color: rgb(26, 188, 156);
+	border: 1px solid rgb(26, 188, 156);
+	border-radius: 10px;
+	padding: 5px;
+}
+
+.pjdtl-share-btn {
+	width: 50px;
+	height: 50px;
+}
+.pjdtl-share-btn:hover {
+	cursor:pointer;
+}
+
+.pjdtl-status-img {
+	width: 90px;
+	height: 90px;
+}
+
+.pjdtl-right-arrow {
+	width: 35px;
+	height: 50px;
+}
+
+.pjdtl-status-font {
+	font-size: 18px;
+	text-align: center;
+	color:#4C4C4C;
+}
+
+.pjdtl-content {
+	width: 780px;
+}
+
+.pjdtl-empty-content {
+	width: 30px;
+}
+
+.pjdtl-reward {
+	width: 350px;
+}
+
+.pjdtl-each-reward {
+	width: 310px;
+	padding: 20px;
+	margin: 10px 0px;
+	border: 1px solid lightgray;
+}
+
+li>img {
+	max-width: 627px;
+	max-height: 365px;
+	width:100%;
+	height:100%;
+	background-color:black;
+	object-fit: contain;
+}
+li>a>img {
+	width:100%;
+	height:100%;
+}
+ul {
+	list-style: none outside none;
+	padding-left: 0;
+	margin: 0;
+}
+
+.demo .item {
+	margin-bottom: 50px;
+}
+
+.content-slider li {
+	background-color: #ed3020;
+	text-align: center;
+	color: #FFF;
+}
+
+.content-slider h3 {
+	margin: 0;
+	padding: 70px 0;
+}
+
+.demo {
+	width: 627px;
+}
+
+.updComment {
+	width: 100%;
+	background-color: #F6F6F6;
+	padding: 15px;
+	border-bottom: 2px solid white;
+}
+#rcBtn:hover {
+	cursor:pointer;
+}
+
+.btnUpdFrm, .btnDel, .rcBtnUpdFrm, .rcBtnDel, .rcBtnUpd, .rcBtnCancel {
+   border:1px solid #747474;
+   background:white;
+   color: #747474;
+   border-radius: 5px;
+}
+.btnUpdFrm:hover, .btnDel:hover, .rcBtnUpdFrm:hover, .rcBtnUpdFrm:hover, .rcBtnDel:hover, .rcBtnUpd:hover, .rcBtnCancel:hover {
+   border:1px solid rgb(26, 188, 156);
+   background:white;
+   color:rgb(26, 188, 156);
+   border-radius: 5px;
+}
+#replyBtnAdd, #btnAdd, #btnUpd, #btnCancel {
+   border:1px solid #747474;
+   background:white;
+   color: #747474;
+   border-radius: 5px;
+}
+#replyBtnAdd:hover, #btnAdd:hover, #btnUpd:hover, #btnCancel:hover {
+   border:1px solid rgb(26, 188, 156);
+   background:white;
+   color:rgb(26, 188, 156);
+   border-radius: 5px;
+}
+
+/*url 복사하기*/
+._tooltip {
+    position: relative;
+	display: inline-block;
+}
+._tooltip ._tooltiptext {
+    visibility: hidden;
+    width: 140px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+._tooltip ._tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+._tooltip:hover ._tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}

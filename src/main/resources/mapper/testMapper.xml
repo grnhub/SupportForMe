@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+	<select id="getUsers" resultType="com.supportforme.biz.test.UserDTO" parameterType="com.supportforme.biz.test.UserSearchDTO">
+	SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM (
+		SELECT * FROM USERS 
+		<where>
+			<if test="ids!=null and ids.length > 0">
+				id in
+				<foreach collection="ids" open="(" close=")" separator="," item="item">
+					#{item}
+				</foreach>
+			</if>
+			<if test="searchCondition == 'id'">
+				and id like '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'name'">
+				and name like '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="role != null and role !=''">
+				and role  like '%' || #{role} || '%'
+			</if>
+		</where>
+			<if test="sort != null and sort !=''">	
+		 		ORDER BY ${sort}
+			</if>
+			<if test="sort == null or sort ==''">	
+		 		ORDER BY ID
+			</if>
+		
+		 ) A )WHERE RNUM BETWEEN #{start} AND #{end}
+	</select>
+	<select id="getCnt" parameterType="com.supportforme.biz.test.UserSearchDTO" resultType="int">
+	SELECT COUNT(*) FROM USERS
+		<where>
+			<if test="ids!=null and ids.length > 0">
+				id in
+				<foreach collection="ids" open="(" close=")" separator="," item="item">
+					#{item}
+				</foreach>
+			</if>
+			<if test="searchCondition == 'id'">
+				and id like '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'name'">
+				and name like '%' || #{searchKeyword} || '%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getUser" parameterType="com.supportforme.biz.test.UserDTO" resultType="com.supportforme.biz.test.UserDTO">
+		SELECT * FROM USERS
+		WHERE  ID = #{id}  
+	</select>
+	
+	<insert id="insertUser" parameterType="com.supportforme.biz.test.UserDTO">
+		INSERT INTO USERS(ID, PASSWORD, NAME, ROLE) 
+		VALUES(#{id},#{password},#{name},#{role})
+	</insert>
+	
+	
+	<update id="updateUser" parameterType="com.supportforme.biz.test.UserDTO">
+		UPDATE USERS 
+		SET 
+		PASSWORD = #{password}, 
+		NAME = #{name}, 
+		ROLE = #{role} 
+		WHERE  ID = #{id}
+	</update>
+	
+	<delete id="deleteUser" parameterType="com.supportforme.biz.test.UserDTO">
+		DELETE FROM USERS
+		WHERE  ID = #{id}
+	</delete>
+	
+	
+</mapper> 

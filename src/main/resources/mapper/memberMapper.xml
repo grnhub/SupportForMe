@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member">
+	<select id="getMembers" resultType="member" parameterType="member">
+	SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM (
+		SELECT * FROM MEMBER 
+		<where>
+			<if test="ids!=null and ids.length > 0">
+				id in
+				<foreach collection="ids" open="(" close=")" separator="," item="item">
+					#{item}
+				</foreach>
+			</if>
+			<if test="searchCondition == 'userid'">
+				AND USER_ID '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'name'">
+				AND NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+
+		</where>		
+		 ) A )WHERE RNUM BETWEEN #{start} AND #{end}
+	</select>
+	<select id="getCnt" parameterType="member" resultType="int">
+	SELECT COUNT(*) FROM MEMBER
+		<where>
+			<if test="ids!=null and ids.length > 0">
+				USER_ID IN
+				<foreach collection="ids" open="(" close=")" separator="," item="item">
+					#{item}
+				</foreach>
+			</if>
+			<if test="searchCondition == 'id'">
+				AND USER_ID LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'name'">
+				AND NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getMember" parameterType="member" resultType="member">
+		SELECT * 
+		FROM MEMBER
+		WHERE  USER_ID = #{userId}  
+	</select>
+	
+	<insert id="insertMember" parameterType="member">
+		INSERT INTO MEMBER (
+							USER_ID, 
+							PASSWORD, 
+							NAME,
+							ADDRESS, 
+							PHONE_NUM, 
+							EMAIL, 
+							INTRODUCTION, 
+							POSTCODE,
+ 							ADDR_DETAIL,
+ 							JOIN_DATE
+  							)
+		VALUES ( 
+				 #{userId}, 
+				 #{password}, 
+				 #{name}, 
+				 #{address}, 
+				 #{phoneNum}, 
+				 #{email}, 
+				 #{introduction}, 
+				 #{postcode},  
+				 #{addrDetail},
+				 SYSDATE
+				)
+	</insert>
+	
+	
+	<update id="updateMember" parameterType="member">
+	UPDATE MEMBER
+	SET 
+	<if test="password != null and password !='' ">
+		PASSWORD = #{password},
+	</if>
+	NAME = #{name}, 
+	ADDRESS = #{address}, 
+	PHONE_NUM = #{phoneNum}, 
+	EMAIL = #{email}, 
+	INTRODUCTION = #{introduction}, 
+	POSTCODE = #{postcode},
+	ADDR_DETAIL = #{addrDetail} 
+	WHERE USER_ID = #{userId}
+
+	</update>
+	
+	<update id="deleteMember" parameterType="member">
+	UPDATE MEMBER
+	SET 
+	PASSWORD = null,
+	NAME = null, 
+	ADDRESS = null, 
+	PHONE_NUM = null, 
+	EMAIL = null, 
+	INTRODUCTION = null, 
+	POSTCODE = null,
+	ADDR_DETAIL = null 
+	WHERE USER_ID = #{userId}	
+	</update>
+	
+	<select id="passwordCheck" parameterType="member" resultType="member">
+		SELECT PASSWORD 
+		FROM MEMBER
+		WHERE  USER_ID = #{userId}  
+	</select>
+	
+	<select id="checkId" parameterType="member" resultType="int">
+		SELECT COUNT(USER_ID) 
+		FROM MEMBER
+		WHERE  USER_ID = #{userId}  
+	</select>
+	
+	<select id="checkEmail" parameterType="member" resultType="int">
+		SELECT COUNT(USER_ID) 
+		FROM MEMBER
+		WHERE  EMAIL = #{email}  
+	</select>
+	
+	
+	
+	<select id="findId" parameterType="member" resultType="member">
+		SELECT USER_ID, EMAIL 
+		FROM MEMBER
+		WHERE NAME = #{name}
+		AND EMAIL = #{email}
+	</select>
+	
+	<select id="findPassword" parameterType="member" resultType="member">
+		SELECT USER_ID,EMAIL, PASSWORD 
+		FROM MEMBER
+		WHERE NAME = #{name}
+		AND EMAIL = #{email}
+		AND USER_ID = #{userId}
+	</select>
+	
+	<select id="updateRandomPassword" parameterType="member" resultType="member">
+		UPDATE MEMBER
+		SET PASSWORD = #{password}
+		WHERE  USER_ID = #{userId}
+	</select>
+	
+	
+	
+	<select id="deleteMemberCheck" parameterType="member" resultType="int">
+		SELECT COUNT(*) FROM PROJECT
+		WHERE  USER_ID = #{userId}
+		AND PROGRESS ='001'
+	</select>
+</mapper> 

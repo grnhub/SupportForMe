@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin">
+	<select id="getAdminMembers" resultType="member"
+		parameterType="member">
+		SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM (
+		SELECT * FROM MEMBER
+		<where>
+			PASSWORD IS NOT NULL AND USER_ID != 'Admin'
+			<if test="searchCondition == 'userId'">
+				AND USER_ID = #{searchKeyword}
+			</if>
+			<if test="searchCondition == 'name'">
+				AND NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'email'">
+				AND EMAIL LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'phoneNum'">
+				AND PHONE_NUM LIKE '%' || #{searchKeyword} || '%'
+			</if>
+		</where>
+		) A )WHERE RNUM BETWEEN #{start} AND #{end}
+	</select>
+	<select id="getCntAdminMembers" parameterType="member"
+		resultType="int">
+		SELECT COUNT(*) FROM MEMBER
+		<where>
+			PASSWORD IS NOT NULL AND USER_ID != 'Admin'
+			<if test="searchCondition == 'userId'">
+				AND USER_ID = #{searchKeyword}
+			</if>
+			<if test="searchCondition == 'name'">
+				AND NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'email'">
+				AND EMAIL LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'phoneNum'">
+				AND PHONE_NUM LIKE '%' || #{searchKeyword} || '%'
+			</if>
+		</where>
+	</select>
+
+	<update id="deleteAdminMembers" parameterType="adminSearch">
+		UPDATE MEMBER
+		SET
+		PASSWORD = null,
+		NAME = null,
+		ADDRESS = null,
+		PHONE_NUM = null,
+		EMAIL = null,
+		INTRODUCTION = null,
+		POSTCODE = null,
+		ADDR_DETAIL = null
+		<where>
+			USER_ID IN
+			<foreach collection="ids" open="(" close=")" separator=","
+				item="item">
+				#{item}
+			</foreach>
+		</where>
+	</update>
+	
+	<resultMap type="java.util.HashMap" id="supportForMePickUpMap">
+		<result column="PROJECT_NO" property="projectNo" />
+		<result column="PROJECT_NAME" property="projectName" />
+		<result column="NAME" property="name" />
+		<result column="USER_ID" property="userId" />
+		<result column="SUPPORT_PICK_YN" property="supportPickYn" />
+		<result column="PROJECT_STATUS" property="projectStatus" />
+	</resultMap>
+
+	<select id="supportForMePickUpList" parameterType="adminSearch" resultMap="supportForMePickUpMap">
+	
+	SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM (
+		SELECT
+				PROJECT.PROJECT_NO,
+				PROJECT.PROJECT_NAME,
+				MEMBER.NAME,
+				PROJECT.USER_ID,
+				PROJECT.SUPPORT_PICK_YN,
+        		COMMON_CODE.CODE_NAME PROJECT_STATUS 
+		FROM PROJECT
+		JOIN MEMBER ON PROJECT.USER_ID = MEMBER.USER_ID
+    	JOIN COMMON_CODE ON PROJECT.PROGRESS = COMMON_CODE.CODE AND COMMON_CODE.CODE_GROUP='C03'
+	
+		<where>
+		
+			PASSWORD IS NOT NULL 
+			<if test="searchCondition == 'projectNo'">
+				AND PROJECT.PROJECT_NO LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'projectName'">
+				AND PROJECT.PROJECT_NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'name'">
+				AND MEMBER.NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'userId'">
+				AND PROJECT.USER_ID LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="supportForMePickUp != '' and supportForMePickUp != null ">
+				AND PROJECT.SUPPORT_PICK_YN = #{supportForMePickUp}
+			</if>
+			AND  PROJECT.PROGRESS ='001'
+		</where>
+	) A )WHERE RNUM BETWEEN #{start} AND #{end}
+	</select>
+	
+	<select id="supportForMePickUpListCnt" parameterType="adminSearch" resultType="int">
+	
+		SELECT
+				COUNT(PROJECT.PROJECT_NO)
+				
+		FROM PROJECT
+		JOIN MEMBER ON PROJECT.USER_ID = MEMBER.USER_ID
+		
+		<where>
+			PASSWORD IS NOT NULL
+			<if test="searchCondition == 'projectNo'">
+				AND PROJECT.PROJECT_NO LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'projectName'">
+				AND PROJECT.PROJECT_NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'name'">
+				AND MEMBER.NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'userId'">
+				AND PROJECT.USER_ID LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="supportForMePickUp != '' and supportForMePickUp != null ">
+				AND PROJECT.SUPPORT_PICK_YN = #{supportForMePickUp}
+			</if>
+			AND  PROJECT.PROGRESS ='001'
+		</where>
+	</select>
+	
+	<update id="adminSupportForMePick" parameterType="adminSearch">
+		UPDATE PROJECT
+		<if test=" flag == 'no'">
+			SET SUPPORT_PICK_YN = 'N'
+		</if>
+		<if test=" flag == 'yes'">
+			SET SUPPORT_PICK_YN = 'Y'
+		</if>
+		<where>
+			PROJECT_NO IN
+			<foreach collection="ids" open="(" close=")" separator=","
+				item="item">
+				#{item}
+			</foreach>
+		</where>
+	</update>
+	
+	<resultMap type="java.util.HashMap" id="getProjectProgressListMap">
+		<result column="PROJECT_NO" property="projectNo" />
+		<result column="PROJECT_NAME" property="projectName" />
+		<result column="NAME" property="name" />
+		<result column="USER_ID" property="userId" />
+		<result column="PROJECT_DEADLINE" property="projectDeadline" />
+		<result column="TARGET_AMOUNT" property="targetAmount" />
+		<result column="CODE_NAME" property="codeName" />
+	</resultMap>
+	
+	<select id="getProjectProgressList" parameterType="adminSearch" resultMap="getProjectProgressListMap">
+	SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM (
+		SELECT 
+				PROJECT.PROJECT_NO,
+				PROJECT.PROJECT_NAME,
+      			MEMBER.NAME,
+      			PROJECT.USER_ID,
+      			PROJECT.PROJECT_DEADLINE,
+      			PROJECT.TARGET_AMOUNT,
+    			COMMON_CODE.CODE_NAME
+		FROM PROJECT 
+		JOIN MEMBER ON PROJECT.USER_ID = MEMBER.USER_ID
+		JOIN COMMON_CODE ON COMMON_CODE.CODE =PROJECT.PROGRESS  AND COMMON_CODE.CODE_GROUP ='C03'
+		<where>
+			MEMBER.PASSWORD IS NOT NULL AND PROJECT.PROGRESS != '004' 
+			<if test="searchCondition == 'projectNo'">
+				AND PROJECT.PROJECT_NO LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'projectName'">
+				AND PROJECT.PROJECT_NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'name'">
+				AND MEMBER.NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'userId'">
+				AND PROJECT.USER_ID LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="progress != '' and progress != null ">
+				AND PROJECT.PROGRESS = #{progress}
+			</if>
+		
+		</where>
+		ORDER BY PROJECT.PROJECT_NO DESC 
+	) A )WHERE RNUM BETWEEN #{start} AND #{end}
+	</select>
+	
+	
+	<select id="ProjectProgressListCount" parameterType="adminSearch" resultType="int">
+		SELECT 
+				COUNT(PROJECT.PROJECT_NO)
+		FROM PROJECT 
+		JOIN MEMBER ON PROJECT.USER_ID = MEMBER.USER_ID
+		JOIN COMMON_CODE ON COMMON_CODE.CODE =PROJECT.PROGRESS AND COMMON_CODE.CODE_GROUP ='C03'
+		<where>
+			MEMBER.PASSWORD IS NOT NULL AND PROJECT.PROGRESS != '004'
+
+			<if test="searchCondition == 'projectName'">
+				AND PROJECT.PROJECT_NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'name'">
+				AND MEMBER.NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			
+			<if test="searchCondition == 'userId'">
+				AND PROJECT.USER_ID LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="progress != '' and progress != null ">
+				AND PROJECT.PROGRESS = #{progress}
+			</if>
+		
+		</where>
+	</select>
+	
+	
+	<update id="adminProjectProgress" parameterType="adminSearch">
+		UPDATE PROJECT
+		<if test=" flag == '001'">
+			SET PROGRESS = '001'
+		</if>
+		<if test=" flag == '003'">
+			SET PROGRESS = '003'
+		</if>
+		<if test=" flag == '005'">
+			SET PROGRESS = '005'
+		</if>
+		<where>
+			PROJECT_NO IN
+			<foreach collection="ids" open="(" close=")" separator="," item="item">
+				#{item}
+			</foreach>
+			<if test=" flag == '001'">
+				AND PROGRESS NOT IN('003','004','006')
+				AND TO_CHAR(TO_DATE(PROJECT_DEADLINE,'yyyy.mm.dd'),'yyyymmdd') <![CDATA[ > ]]> TO_CHAR(SYSDATE,'yyyymmdd')
+			</if>
+			<if test=" flag == '003'">
+				AND PROGRESS NOT IN('006')
+			</if>
+			<if test=" flag == '005'">
+				AND PROGRESS NOT IN('006')
+			</if>
+		</where>
+	</update>
+	
+	
+	
+	
+</mapper> 

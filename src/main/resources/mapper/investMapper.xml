@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="invest">
+
+	<resultMap type="java.util.HashMap" id="presentListMap">
+		<result column="PRESENT_NO" property="presentNo" />
+		<result column="PRESENT_PRICE" property="presentPrice" />
+		<result column="PRESENT_NAME" property="presentName" />
+		<result column="PROJECT_NO" property="projectNo" />
+		<result column="DELIVERY_DATE" property="deliveryDate" />
+		<result column="PROJECT_NAME" property="projectName" />
+	</resultMap>
+
+	<select id="getPresentList" parameterType="invest"
+		resultMap="presentListMap">
+		SELECT PRESENT.PRESENT_NO PRESENT_NO,
+		PRESENT.PRESENT_PRICE PRESENT_PRICE,
+		PRESENT.PRESENT_NAME PRESENT_NAME,
+		PRESENT.PROJECT_NO PROJECT_NO,
+		PROJECT.DELIVERY_DATE DELIVERY_DATE,
+		PROJECT.PROJECT_NAME
+		FROM PRESENT JOIN PROJECT
+		ON PRESENT.PROJECT_NO = PROJECT.PROJECT_NO
+		WHERE
+		PRESENT.PROJECT_NO = #{projectNo}
+		ORDER BY PRESENT.PRESENT_PRICE
+	</select>
+
+	<resultMap type="java.util.HashMap" id="investListMap">
+		<result column="INVEST_NO" property="investNo" />
+		<result column="PROJECT_NAME" property="projectName" />
+		<result column="INVENST_AMOUNT" property="invenstAmount" />
+		<result column="PAY_TYPE" property="payType" />
+		<result column="PAYMENT_STATE" property="paymentState" />
+		<result column="INVEST_DATE" property="investDate" />
+	</resultMap>
+
+	<select id="getInvests"
+		parameterType="com.supportforme.biz.invest.InvestSearchDTO"
+		resultMap="investListMap">
+		SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM (
+			SELECT
+					INVEST.INVEST_NO AS INVEST_NO,
+					PROJECT.PROJECT_NAME AS PROJECT_NAME,
+					INVEST.INVESTMENT_AMOUNT AS INVENST_AMOUNT,
+					COMMON_CODE.CODE_NAME AS
+					PAY_TYPE,
+					COMMON_CODE2.CODE_NAME AS PAYMENT_STATE,
+					TO_DATE(SUBSTR(INVEST.INVEST_NO,1,8),'rrrr-mm-dd') AS INVEST_DATE
+			FROM
+					INVEST
+					JOIN PROJECT ON INVEST.PROJECT_NO = PROJECT.PROJECT_NO
+					JOIN COMMON_CODE ON (COMMON_CODE.CODE = INVEST.PAY_TYPE AND	COMMON_CODE.CODE_GROUP ='A01')
+					JOIN COMMON_CODE COMMON_CODE2 ON (COMMON_CODE2.CODE = INVEST.PAYMENT_STATE AND COMMON_CODE2.CODE_GROUP ='B02')
+		<where>
+			INVEST.USER_ID = #{userId}
+			<if test="searchCondition == 'projectName'">
+				AND PROJECT.PROJECT_NAME LIKE '%' || #{searchKeyword} ||
+				'%'
+			</if>
+			<if test="searchCondition == 'investNo'">
+				AND INVEST.INVEST_NO LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if
+				test="startdate != null and enddate !=null and startdate != '' and enddate != ''">
+				AND TO_DATE(SUBSTR(INVEST.INVEST_NO,1,8),'rrrr-mm-dd') BETWEEN
+				#{startdate} AND #{enddate}
+			</if>
+			<if test="payType == '신용카드'">
+				AND INVEST.PAY_TYPE = '001'
+			</if>
+			<if test="payType == '계좌결제'">
+				AND INVEST.PAY_TYPE = '002'
+			</if>
+			<if test="payType == '휴대폰결제'">
+				AND INVEST.PAY_TYPE = '003'
+			</if>
+		</where>
+		ORDER BY INVEST.INVEST_NO DESC
+		) A )WHERE RNUM BETWEEN #{start} AND #{end}
+
+	</select>
+	<select id="getCnt" parameterType="investSearch"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM INVEST JOIN PROJECT
+		ON INVEST.PROJECT_NO = PROJECT.PROJECT_NO
+		<where>
+			INVEST.USER_ID = #{userId}
+			<if test="searchCondition == 'projectName'">
+				AND PROJECT.PROJECT_NAME LIKE '%' || #{searchKeyword} ||
+				'%'
+			</if>
+			<if test="searchCondition == 'investNo'">
+				AND INVEST.INVEST_NO LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if
+				test="startdate != null and enddate !=null and startdate != '' and enddate != ''">
+				AND TO_DATE(SUBSTR(INVEST.INVEST_NO,1,8),'rrrr-mm-dd') BETWEEN
+				#{startdate} AND #{enddate}
+			</if>
+			<if test="payType == '신용카드'">
+				AND INVEST.PAY_TYPE = '001'
+			</if>
+			<if test="payType == '계좌결제'">
+				AND INVEST.PAY_TYPE = '002'
+			</if>
+			<if test="payType == '휴대폰결제'">
+				AND INVEST.PAY_TYPE = '003'
+			</if>
+		</where>
+	</select>
+
+
+	<resultMap type="java.util.HashMap" id="investDetailMap">
+		<result column="INVEST_NO" property="investNo" />
+		<result column="PROJECT_NAME" property="projectName" />
+		<result column="INVENST_AMOUNT" property="invenstAmount" />
+		<result column="PAY_TYPE" property="payType" />
+		<result column="PAYMENT_STATE" property="paymentState" />
+		<result column="POSTCODE" property="postcode" />
+		<result column="ADDRESS" property="address" />
+		<result column="ADDR_DETAIL" property="addrDetail" />
+		<result column="PHONE_NUM" property="phoneNum" />
+		<result column="EMAIL" property="email" />
+		<result column="PRESENT_NAME" property="presentName" />
+	</resultMap>
+
+	<select id="getInvest" parameterType="invest"
+		resultMap="investDetailMap">
+		SELECT
+				INVEST.INVEST_NO 			AS INVEST_NO,
+				PROJECT.PROJECT_NAME 		AS PROJECT_NAME,
+				INVEST.INVESTMENT_AMOUNT 	AS INVENST_AMOUNT,
+				COMMON_CODE.CODE_NAME 		AS PAY_TYPE,
+				COMMON_CODE2.CODE_NAME 		AS PAYMENT_STATE,
+				TO_DATE(SUBSTR(INVEST.INVEST_NO,1,8),'rrrr-mm-dd') AS INVEST_DATE,
+				INVEST.POSTCODE 			AS POSTCODE,
+				INVEST.ADDRESS 				AS ADDRESS,
+				INVEST.ADDR_DETAIL 			AS ADDR_DETAIL,
+				INVEST.PHONE_NUM 			AS PHONE_NUM,
+				INVEST.EMAIL 				AS EMAIL,
+				PRESENT.PRESENT_NAME 		AS PRESENT_NAME
+		FROM INVEST 
+		JOIN PROJECT ON INVEST.PROJECT_NO =	PROJECT.PROJECT_NO
+		JOIN COMMON_CODE ON (COMMON_CODE.CODE =	INVEST.PAY_TYPE AND COMMON_CODE.CODE_GROUP ='A01')
+		JOIN COMMON_CODE COMMON_CODE2 ON (COMMON_CODE2.CODE = INVEST.PAYMENT_STATE AND COMMON_CODE2.CODE_GROUP ='B02')
+		JOIN PRESENT ON INVEST.PRESENT_NO = PRESENT.PRESENT_NO
+		WHERE INVEST_NO = #{investNo}
+	</select>
+
+	<insert id="insertInvest" parameterType="invest">
+		INSERT INTO INVEST (
+							INVEST_NO,
+							INVESTMENT_AMOUNT,
+							PAY_TYPE,
+							PRESENT_NO,
+							USER_ID,
+							PROJECT_NO,
+							PAYMENT_STATE,
+							POSTCODE,
+							ADDRESS,
+							ADDR_DETAIL,
+							PHONE_NUM,
+							EMAIL,
+							NAME,
+							REQUEST,
+							UUID
+		) VALUES (
+					TO_CHAR(SYSDATE,'yyyymmdd')||lpad(INVEST_SEQ.NEXTVAL ,4,0),
+					#{investmentAmount},
+					'001',
+					#{presentNo},
+					#{userId},
+					#{projectNo},
+					'001',
+					#{postcode},
+					#{address},
+					#{addrDetail},
+					#{phoneNum},
+					#{email},
+					#{name},
+					#{request},
+					#{uuid}
+		)
+
+	</insert>
+
+
+	<update id="updateInvest" parameterType="invest">
+
+	</update>
+
+	<delete id="deleteInvest" parameterType="invest">
+
+	</delete>
+
+
+
+	<resultMap type="java.util.HashMap" id="investMyInvestListMap">
+		<result column="INVEST_NO" property="investNo" />
+		<result column="PROJECT_NAME" property="projectName" />
+		<result column="INVESTMENT_AMOUNT" property="invenstAmount" />
+		<result column="PAY_TYPE" property="payType" />
+		<result column="PAYMENT_STATE" property="paymentState" />
+		<result column="INVEST_DATE" property="investDate" />
+		<result column="DELIVERY_DATE" property="deliveryDate" />
+		<result column="PRESENT_NAME" property="presentName" />
+		<result column="PRESENT_PRICE" property="presentPrice" />
+		<result column="PROJECT_PROGRESS" property="projectProgress" />
+		<result column="PROJECT_PROGRESS_RATE" property="projectProgressRate" />
+		<result column="IMAGE" property="image" />
+		<result column="NAME" property="name" />
+		<result column="PROJECT_NO" property="projectNo" />
+	</resultMap>
+
+	<select id="getMyInvestList"	parameterType="com.supportforme.biz.invest.InvestSearchDTO" resultMap="investMyInvestListMap">
+	SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM (
+		SELECT 
+				INVEST.INVEST_NO 									INVEST_NO,
+				PROJECT.PROJECT_NAME 								PROJECT_NAME,
+				INVEST.INVESTMENT_AMOUNT 							INVESTMENT_AMOUNT,
+				COMMON_CODE.CODE_NAME								PAY_TYPE,
+				COMMON_CODE2.CODE_NAME								PAYMENT_STATE,
+				TO_CHAR(TO_DATE(SUBSTR(INVEST.INVEST_NO,0,8),'rrrrmmdd'), 'rrrr.mm.dd')	INVEST_DATE,
+				TO_CHAR(TO_DATE(PRESENT.PRESENT_DELIVERY_DATE,'rrrr-mm-dd'), 'rrrr.mm.dd')	DELIVERY_DATE,
+				PRESENT.PRESENT_NAME								PRESENT_NAME,
+				PRESENT.PRESENT_PRICE 								PRESENT_PRICE,
+				COMMON_CODE3.CODE_NAME 								PROJECT_PROGRESS,
+				PROJECT_PROGRESS_RATE(INVEST.PROJECT_NO) 			PROJECT_PROGRESS_RATE,
+				PROJECT.IMAGE 										IMAGE,
+				MEMBER.NAME 										NAME,
+				INVEST.PROJECT_NO									PROJECT_NO
+		FROM INVEST
+		JOIN PROJECT ON INVEST.PROJECT_NO = PROJECT.PROJECT_NO
+		JOIN PRESENT ON INVEST.PRESENT_NO = PRESENT.PRESENT_NO
+		JOIN COMMON_CODE ON (INVEST.PAY_TYPE = COMMON_CODE.CODE AND	COMMON_CODE.CODE_GROUP='A01')
+		JOIN COMMON_CODE COMMON_CODE2 ON (INVEST.PAYMENT_STATE = COMMON_CODE2.CODE	AND COMMON_CODE2.CODE_GROUP='B02')
+		JOIN COMMON_CODE COMMON_CODE3 ON (PROJECT.PROGRESS = COMMON_CODE3.CODE AND	COMMON_CODE3.CODE_GROUP='C03')
+		JOIN MEMBER ON PROJECT.USER_ID = MEMBER.USER_ID
+		<where>
+			 INVEST.USER_ID = #{userId}
+			<if test="investNo != null and investNo != '' ">
+				<![CDATA[ 
+				AND INVEST.INVEST_NO < #{investNo}
+				]]>
+			</if>
+		</where>
+		ORDER BY INVEST.INVEST_NO DESC
+	) A )WHERE RNUM BETWEEN ${start} AND ${end}
+	</select>
+	
+	<resultMap type="java.util.HashMap" id="MyInvestorListMap">
+		<result column="INVEST_NO" property="investNo" />
+		<result column="NAME" property="name" />
+		<result column="INVESTMENT_AMOUNT" property="investmentAmount" />
+		<result column="INVEST_DATE" property="investDate" />
+		<result column="PRESENT_NAME" property="presentName" />
+		<result column="POSTCODE" property="postcode" />
+		<result column="ADDRESS" property="address" />
+		<result column="EMAIL" property="email" />
+		<result column="PHONE_NUM" property="phoneNum" />
+		<result column="PROJECT_NO" property="projectNo" />
+		<result column="PROJECT_NAME" property="projectName" />
+		<result column="USER_ID" property="userId" />
+	</resultMap>
+	
+	<select id="getMyInvestorList"	parameterType="com.supportforme.biz.invest.InvestSearchDTO" resultMap="MyInvestorListMap">
+	SELECT * FROM ( SELECT ROWNUM AS RNUM, A.* FROM (
+		SELECT 
+				INVEST.INVEST_NO														INVEST_NO,
+				INVEST.NAME																NAME,
+				INVEST.INVESTMENT_AMOUNT												INVESTMENT_AMOUNT, 
+				TO_CHAR(TO_DATE(SUBSTR(INVEST.INVEST_NO,0,8),'rrrrmmdd'), 'rrrr/mm/dd')	INVEST_DATE, 
+				PRESENT.PRESENT_NAME													PRESENT_NAME,
+				INVEST.POSTCODE															POSTCODE,
+				INVEST.ADDRESS||' '||INVEST.ADDR_DETAIL									ADDRESS,	
+				INVEST.EMAIL															EMAIL,
+				INVEST.PHONE_NUM														PHONE_NUM,
+				PROJECT.PROJECT_NO														PROJECT_NO,
+				PROJECT.PROJECT_NAME	  												PROJECT_NAME,
+				PROJECT.USER_ID															USER_ID
+		FROM INVEST 
+		JOIN PRESENT ON INVEST.PROJECT_NO = INVEST.PROJECT_NO AND INVEST.PRESENT_NO = PRESENT.PRESENT_NO
+		JOIN COMMON_CODE ON (INVEST.PAYMENT_STATE= COMMON_CODE.CODE AND COMMON_CODE.CODE_GROUP = 'B02')
+		JOIN PROJECT ON(INVEST.PROJECT_NO = PROJECT.PROJECT_NO)
+		JOIN COMMON_CODE COMMON_CODE2 ON (PROJECT.PROGRESS = COMMON_CODE2.CODE AND COMMON_CODE2.CODE_GROUP = 'C03')
+		<where>
+			COMMON_CODE.CODE = '001' 
+			AND COMMON_CODE2.CODE = '002'
+			AND PROJECT.USER_ID = #{userId}
+			<if test="searchCondition == 'projectName'">
+				AND PROJECT.PROJECT_NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'investNo'">
+				AND INVEST.INVEST_NO LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'presentName'">
+				AND PRESENT.PRESENT_NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'address'">
+				AND ADDRESS LIKE '%' || #{searchKeyword} || '%'
+			</if>
+		</where>
+		ORDER BY INVEST_DATE DESC
+	) A )WHERE RNUM BETWEEN ${start} AND ${end}
+	</select>
+	
+	<select id="getInvestorCnt" parameterType="investSearch" resultType="int">
+		SELECT COUNT(*)
+		FROM INVEST 
+		JOIN PRESENT ON INVEST.PROJECT_NO = INVEST.PROJECT_NO AND INVEST.PRESENT_NO = PRESENT.PRESENT_NO
+		JOIN COMMON_CODE ON (INVEST.PAYMENT_STATE= COMMON_CODE.CODE AND COMMON_CODE.CODE_GROUP = 'B02')
+		JOIN PROJECT ON(INVEST.PROJECT_NO = PROJECT.PROJECT_NO)
+		JOIN COMMON_CODE COMMON_CODE2 ON (PROJECT.PROGRESS = COMMON_CODE2.CODE AND COMMON_CODE2.CODE_GROUP = 'C03')
+		<where>
+			COMMON_CODE.CODE = '001' 
+			AND COMMON_CODE2.CODE = '002'
+			AND PROJECT.USER_ID = #{userId}
+			<if test="searchCondition == 'projectName'">
+				AND PROJECT.PROJECT_NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'investNo'">
+				AND INVEST.INVEST_NO LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'presentName'">
+				AND PRESENT.PRESENT_NAME LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="searchCondition == 'address'">
+				AND ADDRESS LIKE '%' || #{searchKeyword} || '%'
+			</if>
+		</where>
+	</select>
+	
+</mapper> 

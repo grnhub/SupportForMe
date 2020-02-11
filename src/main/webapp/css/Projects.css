@@ -1,0 +1,133 @@
+
+.pjdtl_bodysize {
+	margin-left: auto;
+	margin-right: auto;
+	width: 1100px;
+}
+ 
+.wrapper {
+	display: grid;
+	grid-template-columns: 25% 25% 25% 25%;
+	grid-auto-rows: minmax(100px, auto);
+}
+
+.div1 {
+	grid-column: 1/5;
+}
+
+.div2 {
+	display: grid;
+	grid-column: 1/5;
+	grid-column-gap: 20px;
+	grid-row-gap: 2em;
+	grid-template-columns: repeat(4, 1fr);
+
+	grid-auto-rows: minmax(300px, auto);
+
+}
+
+
+<!--
+-->
+.project_box {
+	width: 100%;
+	height: 380px;
+	border: 1px solid #EEEEEE;
+	padding:0;
+	 overflow: hidden;
+ 	transition: all 0.3s;
+}
+
+.project_box:hover {
+	/* 	border: 4px solid rgb(26, 188, 156); */
+	box-shadow: 5px 5px 3px lightgrey;
+}
+.project_box:hover .mypage_project_image img{
+  transform: scale(1.05);
+}
+.project_state,.state {
+	width: 100px;
+	height: 30px;
+	font-weight:700;
+	font-family:'';
+	border-radius:5px;
+	text-align:center;
+	padding-top:2px;
+	margin-bottom:5px;
+	
+	margin-top:10px;
+}
+.mypage_project_content {
+	margin-left: 15px;
+	width: 100%;
+	height: 180px;
+}
+
+.mypage_project_image {
+	width: 100%;
+	height: 170px;
+	margin: -2px -5px 0 0;
+	padding:0 ;
+}
+
+.mypage_project_image img {
+	max-width: 100%;
+	margin:0;
+	width: 100%;
+	height: 100%;
+	object-fit: .mypage_project_image;
+	transition: all 0.5s;
+}
+.mypage_project_content ul {
+	list-style-type: none;
+}
+
+.text3d {
+	/* text-shadow:1px 1px white, -1px -1px #666; */
+	font-size:17px;
+}
+
+.text3dPn {
+	/*  text-shadow:-1px -1px white, 1px 1px #666; */
+	font-size: 18px;
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 200px;
+	height:30px;
+}
+ .tI {
+	display:inline-block;
+	width:195px;
+}
+/*진행중 */
+.progress001 {
+	border:1px solid #FF007F;
+	color: #FF007F;
+}
+/* 마감 */
+.progress002 {
+	border:1px solid #8041D9;
+	color:#8041D9;
+}
+/* 무산 */
+.progress003 {
+	border:1px solid #a6a6a6;
+	color:#a6a6a6;
+}
+/* 제작중 */
+.progress004 {
+	border:1px solid #CC3D3D;
+	color: #CC3D3D;
+}
+/* 보류 */
+.progress005 {
+	border:1px solid #008299;
+	color:#008299;
+}
+/* 완료 */
+.progress006 {
+	border:1px solid #D9418C;
+	color:#D9418C;
+}

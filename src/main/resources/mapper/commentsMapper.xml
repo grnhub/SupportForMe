@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="comments">
+
+<!-- 댓글 불러오기 -->
+<!-- 댓글 -->
+<select id="getCommentsList" resultType="comments" parameterType="comments">
+
+	SELECT COMMENT_NO,
+		   TOP_COMMENT_NO,
+		   COMMENT_CONTENT,
+		   NVL(COMMENT_DATE, ' ') AS COMMENT_DATE,
+		   PROJECT_NO,
+		   NVL(USER_ID, ' ') AS USER_ID
+	FROM COMMENTS
+	WHERE PROJECT_NO = #{projectNo} AND TOP_COMMENT_NO IS NULL
+	ORDER BY COMMENT_NO DESC
+</select>
+<!-- 답글 개수 -->
+<select id="getReplyCommentCnt" resultType="string" parameterType="comments">
+	SELECT NVL((COUNT(*)), '0') as REPLY_COMMENT_CNT
+	FROM COMMENTS
+	WHERE TOP_COMMENT_NO = #{commentNo}
+</select>
+
+<!-- 답글 -->
+<select id="getReplyCommentsList" resultType="comments" parameterType="comments">
+	SELECT *
+	FROM COMMENTS
+	WHERE TOP_COMMENT_NO = #{topCommentNo}
+	ORDER BY COMMENT_NO DESC
+</select>
+
+<!-- 단건 -->
+<select id="getComments" resultType="comments" parameterType="comments">
+	SELECT *
+	FROM COMMENTS
+	WHERE COMMENT_NO = #{commentNo}
+
+</select>
+
+<!-- 댓글입력 -->
+<insert id="insertComments" parameterType="comments">
+	<selectKey keyProperty="commentNo" resultType="string" order="BEFORE">
+		  SELECT (TO_CHAR(SYSDATE, 'rrrrMMdd') || LPAD((COMMENTS_SEQ.NEXTVAL),4,0)) FROM DUAL
+	</selectKey>
+ 	INSERT INTO COMMENTS (COMMENT_NO,
+ 				 		  COMMENT_CONTENT, 
+ 				 		  COMMENT_DATE, 
+ 				 		  PROJECT_NO, 
+ 				 		  USER_ID)
+ 		    VALUES (#{commentNo},
+ 		    		#{commentContent},
+ 		    		TO_CHAR(SYSDATE, 'YY.MM.DD HH24:MI:SS'),
+ 		    		#{projectNo},
+ 		    		#{userId})
+</insert>
+	
+<!-- 댓글수정 -->
+<update id="updateComments" parameterType="comments">
+	UPDATE COMMENTS
+	SET COMMENT_CONTENT = #{commentContent},
+		COMMENT_DATE = TO_CHAR(SYSDATE, 'YY.MM.DD HH24:MI:SS')
+	WHERE COMMENT_NO = #{commentNo}
+</update>
+
+<!-- 댓글삭제(댓글에 답글이 없을때만 완전히 삭제됨/답글이 달려있는상태) -->
+<!-- 프로시저로 만듦 (프로시저명 : delete_comments) -->
+<select id="deleteComments" statementType="CALLABLE" parameterType="comments">
+	{CALL DELETE_COMMENTS (#{commentNo})}
+</select>
+<select id="getCommentCnt" resultType="string" parameterType="comments">
+	SELECT COUNT(*) AS CNT
+	FROM COMMENTS
+	WHERE TOP_COMMENT_NO = #{commentNo}
+</select>
+
+<!-- 답글입력 -->
+<insert id="insertReplyComments" parameterType="comments">
+	<selectKey keyProperty="commentNo" resultType="string" order="BEFORE">
+		  SELECT (TO_CHAR(SYSDATE, 'rrrrMMdd') || LPAD((COMMENTS_SEQ.NEXTVAL),4,0)) FROM DUAL
+	</selectKey>
+	INSERT INTO COMMENTS (COMMENT_NO,
+						  COMMENT_CONTENT,
+						  COMMENT_DATE,
+						  TOP_COMMENT_NO,
+						  PROJECT_NO,
+						  USER_ID)
+		  VALUES (#{commentNo},
+		  		  #{commentContent},
+		  		  SYSDATE,
+		  		  #{topCommentNo},
+		  		  #{projectNo},
+		  		  #{userId}
+		  )		
+</insert>
+
+<!-- 답글수정 -->
+<update id="updateReplyComments" parameterType="comments">
+	UPDATE COMMENTS
+	SET COMMENT_CONTENT = #{commentContent},
+		COMMENT_DATE = TO_CHAR(SYSDATE, 'YY.MM.DD HH24:MI:SS')
+	WHERE COMMENT_NO = #{commentNo}
+</update>
+
+</mapper>

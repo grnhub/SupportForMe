@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+	</settings>
+		
+	<!-- Alias 설정 -->
+	<typeAliases>
+		<typeAlias alias="member" type="com.supportforme.biz.member.MemberDTO" />
+		<typeAlias alias="comments" type="com.supportforme.biz.comments.CommentsDTO" />
+		<typeAlias alias="creditinfo" type="com.supportforme.biz.creditInfo.CreditInfoDTO" />
+		<typeAlias alias="hashtag" type="com.supportforme.biz.hashtag.HashtagDTO" />
+		<typeAlias alias="invest" type="com.supportforme.biz.invest.InvestDTO" />
+		<typeAlias alias="investSearch" type="com.supportforme.biz.invest.InvestSearchDTO"/>
+		<typeAlias alias="present" type="com.supportforme.biz.present.PresentDTO" />
+		<typeAlias alias="project" type="com.supportforme.biz.project.ProjectDTO" />
+		<typeAlias alias="admin" type="com.supportforme.biz.admin.AdminDTO" />
+		<typeAlias alias="adminSearch" type="com.supportforme.biz.admin.AdminSearchDTO"/>
+	</typeAliases>
+	
+</configuration>

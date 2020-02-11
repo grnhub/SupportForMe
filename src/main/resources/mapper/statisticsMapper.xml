@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="statistics">
+
+
+	<resultMap type="java.util.HashMap" id="statisticMonthMap">
+		<result column="M01" property="M01" />
+		<result column="M02" property="M02" />
+		<result column="M03" property="M03" />
+		<result column="M04" property="M04" />
+		<result column="M05" property="M05" />
+		<result column="M06" property="M06" />
+		<result column="M07" property="M07" />
+		<result column="M08" property="M08" />
+		<result column="M09" property="M09" />
+		<result column="M10" property="M10" />
+		<result column="M11" property="M11" />
+		<result column="M12" property="M12" />
+	</resultMap>
+	
+	<resultMap type="java.util.HashMap" id="statisticDayMap">
+		<result column="D01" property="D01" />
+		<result column="D02" property="D02" />
+		<result column="D03" property="D03" />
+		<result column="D04" property="D04" />
+		<result column="D05" property="D05" />
+		<result column="D06" property="D06" />
+		<result column="D07" property="D07" />
+		<result column="D08" property="D08" />
+		<result column="D09" property="D09" />
+		<result column="D10" property="D10" />
+		<result column="D11" property="D11" />
+		<result column="D12" property="D12" />
+		<result column="D13" property="D13" />
+		<result column="D14" property="D14" />
+		<result column="D15" property="D15" />
+		<result column="D16" property="D16" />
+		<result column="D17" property="D17" />
+		<result column="D18" property="D18" />
+		<result column="D19" property="D19" />
+		<result column="D20" property="D20" />
+		<result column="D21" property="D21" />
+		<result column="D22" property="D22" />
+		<result column="D23" property="D23" />
+		<result column="D24" property="D24" />
+		<result column="D25" property="D25" />
+		<result column="D26" property="D26" />
+		<result column="D27" property="D27" />
+		<result column="D28" property="D28" />
+		<result column="D29" property="D29" />
+		<result column="D30" property="D30" />
+		<result column="D31" property="D31" />
+	</resultMap>
+	
+	<select id="projectHoldCnt" resultMap="statisticDayMap">
+	WITH TEMP AS(
+	SELECT PROJECT_NO CNT,
+         SUBSTR(PROJECT_NO,1,4) AS "YY", 
+         SUBSTR(PROJECT_NO,5,2) AS "MM", 
+         SUBSTR(PROJECT_NO,7,2) AS "DD",
+         PROGRESS AS "PG" 
+  	FROM PROJECT
+	)
+	SELECT
+			NVL(COUNT(CASE WHEN DD = '01' THEN CNT END),0) "D01",
+			NVL(COUNT(CASE WHEN DD = '02' THEN CNT END),0) "D02",
+			NVL(COUNT(CASE WHEN DD = '03' THEN CNT END),0) "D03",
+			NVL(COUNT(CASE WHEN DD = '04' THEN CNT END),0) "D04",
+			NVL(COUNT(CASE WHEN DD = '05' THEN CNT END),0) "D05",
+			NVL(COUNT(CASE WHEN DD = '06' THEN CNT END),0) "D06",
+			NVL(COUNT(CASE WHEN DD = '07' THEN CNT END),0) "D07",
+			NVL(COUNT(CASE WHEN DD = '08' THEN CNT END),0) "D08",
+			NVL(COUNT(CASE WHEN DD = '09' THEN CNT END),0) "D09",
+			NVL(COUNT(CASE WHEN DD = '10' THEN CNT END),0) "D10",
+			NVL(COUNT(CASE WHEN DD = '11' THEN CNT END),0) "D11",
+			NVL(COUNT(CASE WHEN DD = '12' THEN CNT END),0) "D12",
+			NVL(COUNT(CASE WHEN DD = '13' THEN CNT END),0) "D13",
+			NVL(COUNT(CASE WHEN DD = '14' THEN CNT END),0) "D14",
+			NVL(COUNT(CASE WHEN DD = '15' THEN CNT END),0) "D15",
+			NVL(COUNT(CASE WHEN DD = '16' THEN CNT END),0) "D16",
+			NVL(COUNT(CASE WHEN DD = '17' THEN CNT END),0) "D17",
+			NVL(COUNT(CASE WHEN DD = '18' THEN CNT END),0) "D18",
+			NVL(COUNT(CASE WHEN DD = '19' THEN CNT END),0) "D19",
+			NVL(COUNT(CASE WHEN DD = '20' THEN CNT END),0) "D20",
+			NVL(COUNT(CASE WHEN DD = '21' THEN CNT END),0) "D21",
+			NVL(COUNT(CASE WHEN DD = '22' THEN CNT END),0) "D22",
+			NVL(COUNT(CASE WHEN DD = '23' THEN CNT END),0) "D23",
+			NVL(COUNT(CASE WHEN DD = '24' THEN CNT END),0) "D24",
+			NVL(COUNT(CASE WHEN DD = '25' THEN CNT END),0) "D25",
+			NVL(COUNT(CASE WHEN DD = '26' THEN CNT END),0) "D26",
+			NVL(COUNT(CASE WHEN DD = '27' THEN CNT END),0) "D27",
+			NVL(COUNT(CASE WHEN DD = '28' THEN CNT END),0) "D28",
+			NVL(COUNT(CASE WHEN DD = '29' THEN CNT END),0) "D29",
+			NVL(COUNT(CASE WHEN DD = '30' THEN CNT END),0) "D30",
+			NVL(COUNT(CASE WHEN DD = '31' THEN CNT END),0) "D31"
+	FROM TEMP
+	WHERE YY = TO_CHAR(SYSDATE,'yyyy') AND MM = TO_CHAR(SYSDATE,'mm') AND PG='003'
+	GROUP BY YY,MM
+	</select>
+	
+
+
+	<select id="memberJoinStatisticsMonth"  resultMap="statisticMonthMap">
+	WITH TEMP AS(
+		SELECT USER_ID AS CNT,
+				TO_CHAR(TO_DATE(JOIN_DATE,'yyyy-mm-dd'),'yyyy') AS YY,
+				TO_CHAR(TO_DATE(JOIN_DATE,'yyyy-mm-dd'),'mm') AS MM
+	FROM MEMBER
+	)
+	SELECT
+		COUNT(CASE WHEN MM = '01' THEN CNT END) "M01",
+		COUNT(CASE WHEN MM = '02' THEN CNT END) "M02",
+		COUNT(CASE WHEN MM = '03' THEN CNT END) "M03",
+		COUNT(CASE WHEN MM = '04' THEN CNT END) "M04",
+		COUNT(CASE WHEN MM = '05' THEN CNT END) "M05",
+		COUNT(CASE WHEN MM = '06' THEN CNT END) "M06",
+		COUNT(CASE WHEN MM = '07' THEN CNT END) "M07",
+		COUNT(CASE WHEN MM = '08' THEN CNT END) "M08",
+		COUNT(CASE WHEN MM = '09' THEN CNT END) "M09",
+		COUNT(CASE WHEN MM = '10' THEN CNT END) "M10",
+		COUNT(CASE WHEN MM = '11' THEN CNT END) "M11",
+		COUNT(CASE WHEN MM = '12' THEN CNT END) "M12"
+	FROM TEMP
+	WHERE YY ='2018'
+	GROUP BY YY
+	</select>
+	<select id="memberJoinStatisticsWeek" >
+	WITH TEMP2 AS(
+		SELECT USER_ID AS CNT,
+			TO_CHAR(TO_DATE(JOIN_DATE,'rrrr-mm-dd'),'yyyy') AS YY,
+			TO_CHAR(TO_DATE(JOIN_DATE,'rrrr-mm-dd'),'mm') AS MM,
+			TO_CHAR(TO_DATE(JOIN_DATE,'rrrr-mm-dd'),'W') AS WW
+		FROM MEMBER
+	)
+	SELECT
+			COUNT(CASE WHEN WW = '1' THEN CNT END) "W01",
+			COUNT(CASE WHEN WW = '2' THEN CNT END) "W02",
+			COUNT(CASE WHEN WW = '3' THEN CNT END) "W03",
+			COUNT(CASE WHEN WW = '4' THEN CNT END) "W04",
+			COUNT(CASE WHEN WW = '5' THEN CNT END) "W05"
+	FROM TEMP2
+	WHERE YY = '2018' AND MM ='11'
+	GROUP BY YY,MM
+	
+	</select>
+
+	<select id="memberJoinStatisticsDay" >
+	WITH TEMP AS(
+	SELECT 	USER_ID AS CNT,
+			TO_CHAR(TO_DATE(JOIN_DATE,'rrrr-mm-dd'),'yyyy') AS YY,
+			TO_CHAR(TO_DATE(JOIN_DATE,'rrrr-mm-dd'),'mm') AS MM,
+			TO_CHAR(TO_DATE(JOIN_DATE,'rrrr-mm-dd'),'dd') AS DD
+	FROM MEMBER
+	)
+	SELECT
+			COUNT(CASE WHEN DD = '01' THEN CNT END) "D01",
+			COUNT(CASE WHEN DD = '02' THEN CNT END) "D02",
+			COUNT(CASE WHEN DD = '03' THEN CNT END) "D03",
+			COUNT(CASE WHEN DD = '04' THEN CNT END) "D04",
+			COUNT(CASE WHEN DD = '05' THEN CNT END) "D05",
+			COUNT(CASE WHEN DD = '06' THEN CNT END) "D06",
+			COUNT(CASE WHEN DD = '07' THEN CNT END) "D07",
+			COUNT(CASE WHEN DD = '08' THEN CNT END) "D08",
+			COUNT(CASE WHEN DD = '09' THEN CNT END) "D09",
+			COUNT(CASE WHEN DD = '10' THEN CNT END) "D10",
+			COUNT(CASE WHEN DD = '11' THEN CNT END) "D11",
+			COUNT(CASE WHEN DD = '12' THEN CNT END) "D12",
+			COUNT(CASE WHEN DD = '13' THEN CNT END) "D13",
+			COUNT(CASE WHEN DD = '14' THEN CNT END) "D14",
+			COUNT(CASE WHEN DD = '15' THEN CNT END) "D15",
+			COUNT(CASE WHEN DD = '16' THEN CNT END) "D16",
+			COUNT(CASE WHEN DD = '17' THEN CNT END) "D17",
+			COUNT(CASE WHEN DD = '18' THEN CNT END) "D18",
+			COUNT(CASE WHEN DD = '19' THEN CNT END) "D19",
+			COUNT(CASE WHEN DD = '20' THEN CNT END) "D20",
+			COUNT(CASE WHEN DD = '21' THEN CNT END) "D21",
+			COUNT(CASE WHEN DD = '22' THEN CNT END) "D22",
+			COUNT(CASE WHEN DD = '23' THEN CNT END) "D23",
+			COUNT(CASE WHEN DD = '24' THEN CNT END) "D24",
+			COUNT(CASE WHEN DD = '25' THEN CNT END) "D25",
+			COUNT(CASE WHEN DD = '26' THEN CNT END) "D26",
+			COUNT(CASE WHEN DD = '27' THEN CNT END) "D27",
+			COUNT(CASE WHEN DD = '28' THEN CNT END) "D28",
+			COUNT(CASE WHEN DD = '29' THEN CNT END) "D29",
+			COUNT(CASE WHEN DD = '30' THEN CNT END) "D30",
+			COUNT(CASE WHEN DD = '31' THEN CNT END) "D31"
+	FROM TEMP
+	WHERE YY = '2018' AND MM ='11'
+	GROUP BY YY,MM
+	
+	</select>
+
+	<select id="projectRegMonth" resultMap="statisticMonthMap">
+		WITH TEMP AS
+		(
+		SELECT PROJECT_NO AS "CNT",
+				TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'yyyy') AS "YY",
+				TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'mm') AS "MM",
+				TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'dd') AS "DD",
+				TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'W') AS "WW"
+		FROM PROJECT
+		)
+		SELECT
+				COUNT(CASE WHEN MM = '01' THEN CNT END) "M01",
+				COUNT(CASE WHEN MM = '02' THEN CNT END) "M02",
+				COUNT(CASE WHEN MM = '03' THEN CNT END) "M03",
+				COUNT(CASE WHEN MM = '04' THEN CNT END) "M04",
+				COUNT(CASE WHEN MM = '05' THEN CNT END) "M05",
+				COUNT(CASE WHEN MM = '06' THEN CNT END) "M06",
+				COUNT(CASE WHEN MM = '07' THEN CNT END) "M07",
+				COUNT(CASE WHEN MM = '08' THEN CNT END) "M08",
+				COUNT(CASE WHEN MM = '09' THEN CNT END) "M09",
+				COUNT(CASE WHEN MM = '10' THEN CNT END) "M10",
+				COUNT(CASE WHEN MM = '11' THEN CNT END) "M11",
+				COUNT(CASE WHEN MM = '12' THEN CNT END) "M12"
+		FROM TEMP
+		WHERE YY ='2018'
+		GROUP BY YY
+	</select>
+
+	<select id="projectRegWeek">
+		WITH TEMP AS
+		(
+		SELECT 
+				PROJECT_NO AS "CNT",
+				TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'yyyy') AS "YY",
+				TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'mm') AS "MM",
+				TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'dd') AS "DD",
+				TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'W') AS "WW"
+		FROM PROJECT
+		)
+		SELECT
+				COUNT(CASE WHEN WW = '1' THEN CNT END) "W01",
+				COUNT(CASE WHEN WW = '2' THEN CNT END) "W02",
+				COUNT(CASE WHEN WW = '3' THEN CNT END) "W03",
+				COUNT(CASE WHEN WW = '4' THEN CNT END) "W04",
+				COUNT(CASE WHEN WW = '5' THEN CNT END) "W05"
+		FROM TEMP
+		WHERE YY = '2018' AND MM ='11'
+		GROUP BY YY,MM
+		
+	</select>
+	<select id="projectRegDayCnt"  resultMap="statisticDayMap">
+	WITH TEMP AS
+	(
+	SELECT PROJECT_NO AS "CNT",
+			TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'yyyy') AS "YY",
+			TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'mm') AS "MM",
+			TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'dd') AS "DD",
+			TO_CHAR(TO_DATE(SUBSTR(PROJECT_NO,1,8),'yyyymmdd'),'W') AS "WW"
+	FROM PROJECT
+	)
+	SELECT
+			NVL(COUNT(CASE WHEN DD = '01' THEN CNT END),0) "D01",
+			NVL(COUNT(CASE WHEN DD = '02' THEN CNT END),0) "D02",
+			NVL(COUNT(CASE WHEN DD = '03' THEN CNT END),0) "D03",
+			NVL(COUNT(CASE WHEN DD = '04' THEN CNT END),0) "D04",
+			NVL(COUNT(CASE WHEN DD = '05' THEN CNT END),0) "D05",
+			NVL(COUNT(CASE WHEN DD = '06' THEN CNT END),0) "D06",
+			NVL(COUNT(CASE WHEN DD = '07' THEN CNT END),0) "D07",
+			NVL(COUNT(CASE WHEN DD = '08' THEN CNT END),0) "D08",
+			NVL(COUNT(CASE WHEN DD = '09' THEN CNT END),0) "D09",
+			NVL(COUNT(CASE WHEN DD = '10' THEN CNT END),0) "D10",
+			NVL(COUNT(CASE WHEN DD = '11' THEN CNT END),0) "D11",
+			NVL(COUNT(CASE WHEN DD = '12' THEN CNT END),0) "D12",
+			NVL(COUNT(CASE WHEN DD = '13' THEN CNT END),0) "D13",
+			NVL(COUNT(CASE WHEN DD = '14' THEN CNT END),0) "D14",
+			NVL(COUNT(CASE WHEN DD = '15' THEN CNT END),0) "D15",
+			NVL(COUNT(CASE WHEN DD = '16' THEN CNT END),0) "D16",
+			NVL(COUNT(CASE WHEN DD = '17' THEN CNT END),0) "D17",
+			NVL(COUNT(CASE WHEN DD = '18' THEN CNT END),0) "D18",
+			NVL(COUNT(CASE WHEN DD = '19' THEN CNT END),0) "D19",
+			NVL(COUNT(CASE WHEN DD = '20' THEN CNT END),0) "D20",
+			NVL(COUNT(CASE WHEN DD = '21' THEN CNT END),0) "D21",
+			NVL(COUNT(CASE WHEN DD = '22' THEN CNT END),0) "D22",
+			NVL(COUNT(CASE WHEN DD = '23' THEN CNT END),0) "D23",
+			NVL(COUNT(CASE WHEN DD = '24' THEN CNT END),0) "D24",
+			NVL(COUNT(CASE WHEN DD = '25' THEN CNT END),0) "D25",
+			NVL(COUNT(CASE WHEN DD = '26' THEN CNT END),0) "D26",
+			NVL(COUNT(CASE WHEN DD = '27' THEN CNT END),0) "D27",
+			NVL(COUNT(CASE WHEN DD = '28' THEN CNT END),0) "D28",
+			NVL(COUNT(CASE WHEN DD = '29' THEN CNT END),0) "D29",
+			NVL(COUNT(CASE WHEN DD = '30' THEN CNT END),0) "D30",
+			NVL(COUNT(CASE WHEN DD = '31' THEN CNT END),0) "D31"
+	FROM TEMP
+	WHERE YY = '2018' AND MM ='11'
+	GROUP BY YY,MM
+
+	</select>
+	
+
+
+	<select id="investAmountSumMonth"  resultMap="statisticMonthMap">
+	WITH TEMP AS
+	(
+  	SELECT INVESTMENT_AMOUNT CNT,
+    		TO_CHAR(TO_DATE(SUBSTR(INVEST_NO,1,8),'yyyymmdd'),'yyyy') AS "YY",
+    		TO_CHAR(TO_DATE(SUBSTR(INVEST_NO,1,8),'yyyymmdd'),'mm') AS "MM",
+    		TO_CHAR(TO_DATE(SUBSTR(INVEST_NO,1,8),'yyyymmdd'),'dd') AS "DD",
+    		TO_CHAR(TO_DATE(SUBSTR(INVEST_NO,1,8),'yyyymmdd'),'W') AS "WW"
+  	FROM INVEST
+	)
+	SELECT 
+  			NVL(SUM(CASE   WHEN MM = '01' THEN CNT END),0) "M01",
+  			NVL(SUM(CASE   WHEN MM = '02' THEN CNT END),0) "M02",
+  			NVL(SUM(CASE   WHEN MM = '03' THEN CNT END),0) "M03",
+  			NVL(SUM(CASE   WHEN MM = '04' THEN CNT END),0) "M04",
+  			NVL(SUM(CASE   WHEN MM = '05' THEN CNT END),0) "M05",
+  			NVL(SUM(CASE   WHEN MM = '06' THEN CNT END),0) "M06",
+  			NVL(SUM(CASE   WHEN MM = '07' THEN CNT END),0) "M07",
+  			NVL(SUM(CASE   WHEN MM = '08' THEN CNT END),0) "M08",
+  			NVL(SUM(CASE   WHEN MM = '09' THEN CNT END),0) "M09",
+  			NVL(SUM(CASE   WHEN MM = '10' THEN CNT END),0) "M10",
+  			NVL(SUM(CASE   WHEN MM = '11' THEN CNT END),0) "M11",
+  			NVL(SUM(CASE   WHEN MM = '12' THEN CNT END),0) "M12"
+	FROM TEMP
+	GROUP BY YY
+	</select>
+	
+	
+	
+</mapper> 

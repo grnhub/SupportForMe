@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project">
+
+	<!-- 프로젝트 단건 조회  -->
+	<select id="getProject" resultType="project" parameterType="project">
+		SELECT * FROM PROJECT WHERE PROJECT_NO = #{projectNo}
+	</select>
+	 
+	 <!-- 프로젝트  등록  -->
+	 <insert id="insertProjectProc" statementType="CALLABLE"  parameterType="project">
+	 	{CALL insertProject (#{userId},
+	 						 #{projectNo, mode=OUT, jdbcType=VARCHAR, javaType=string})
+	 </insert>
+	
+	<!-- 프로젝트 수정     -->
+	<update id="updateProject" parameterType="project">
+		 UPDATE PROJECT
+		 SET
+		 USER_ID = #{userId}
+		 <if test="projectName != null and projectName != ''">
+		 ,PROJECT_NAME = #{projectName} 
+		 </if>
+		 <if test="image != null and image != ''">
+		 ,IMAGE = #{image} 
+		  </if>
+		 <if test="targetAmount != null and targetAmount != ''">
+		 ,TARGET_AMOUNT = #{targetAmount} 
+		  </if>
+		 <if test="projectDeadline != null and projectDeadline != ''">
+		 ,PROJECT_DEADLINE = #{projectDeadline}
+		  </if>
+		 <if test="introductionVideo != null">
+		 ,INTRODUCTION_VIDEO = #{introductionVideo}
+		  </if>
+		 <if test="story != null and story != ''">  
+		 ,STORY = #{story}
+		  </if>
+		 <if test="depositAccount != null and depositAccount != ''">  
+		 ,DEPOSIT_ACCOUNT = #{depositAccount}
+		 </if>
+		 <if test="bankCode != null and bankCode != ''"> 
+		 ,BANK_CODE = #{bankCode}
+		 </if>
+		  <if test="introductionImage != null">  
+		 ,INTRODUCTION_IMAGE = #{introductionImage}
+		 </if>
+		 <if test="supportPickYn != null and supportPickYn != ''">
+		 ,SUPPORT_PICK_YN = #{supportPickYn}
+		 </if>
+		 <if test="deliveryDate != null and deliveryDate != ''">
+		 ,DELIVERY_DATE = #{deliveryDate}
+		 </if>
+		 <if test="categoryCode != null and categoryCode != ''">
+		 ,CATEGORY_CODE = #{categoryCode}
+		  </if>
+		 WHERE PROJECT_NO = #{projectNo}
+	</update>
+	
+	
+	<!-- 프로젝트 등록 완료  -->
+	<update id="completeProject" parameterType="project">
+		UPDATE PROJECT
+		SET 
+			progress = '001'
+			<if test="depositAccount != null and depositAccount != ''">  
+		 	,DEPOSIT_ACCOUNT = #{depositAccount}
+		 	</if>
+		 	<if test="bankCode != null and bankCode != ''"> 
+		 	,BANK_CODE = #{bankCode}
+		 	</if>
+			
+		WHERE PROJECT_NO = #{projectNo}
+	</update>
+	
+	<!-- 프로젝트 선물 갯수  -->
+	<select id="getPresentCnt" parameterType="project" resultType="string">
+		SELECT COUNT(*) FROM PRESENT
+		WHERE PROJECT_NO = #{projectNo}
+	</select>
+</mapper> 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="projectDetail">
+<!-- 프로젝트 기본정보 불러오기(상단)-->	
+<select id="getProjectDetail" resultType="project" parameterType="project">
+	SELECT PROJECT_NO,
+       	   PROJECT_NAME, 
+       	   IMAGE, 
+      	   TARGET_AMOUNT, 
+       	   PROJECT_DEADLINE, 
+       	   TO_CHAR((TO_DATE(PROJECT_DEADLINE, 'YYYY.MM.DD')+7), 'YYYY.MM.DD') AS SCHEDULED_PAYMENT_DATE,
+       	   PROJECT_PROGRESS_RATE(#{projectNo}) AS PROJECT_PROGRESS_RATE, 
+       	   STORY,
+       	   INTRODUCTION_VIDEO,
+       	   INTRODUCTION_IMAGE, 
+       	   DELIVERY_DATE,
+       	   CATEGORY_CODE,
+       	   SUPPORT_PICK_YN,
+           CODE_NAME AS PROGRESS
+	FROM PROJECT
+  	JOIN COMMON_CODE ON PROJECT.PROGRESS = COMMON_CODE.CODE
+	WHERE PROJECT_NO = #{projectNo} AND COMMON_CODE.CODE_GROUP='C03'
+</select>
+
+<!-- 해시태그 불러오기 -->
+<select id="getProjectHashtags" resultType="hashtag" parameterType="project">
+	SELECT *
+	FROM HASHTAG
+	WHERE PROJECT_NO = #{projectNo}
+</select>
+
+<!-- 프로젝트별 모인금액, 투자자 인원수 불러오기 -->
+<select id="getProjectAboutInvest" resultType="invest" parameterType="project">
+	SELECT NVL((SUM(INVESTMENT_AMOUNT)), '0') AS TOTAL_INVEST_AMOUNT,
+		   NVL((COUNT(*)), '0') AS HEADCOUNT
+	FROM INVEST
+	WHERE PROJECT_NO = #{projectNo}
+</select>
+
+<!-- 프로젝트의 리워드(present) 목록 불러오기(화면 오른쪽) -->
+<select id="getProjectPresents" resultType="present" parameterType="project">
+	SELECT PRESENT_NO,
+		   PRESENT_NAME,
+		   PRESENT_PRICE
+	FROM PRESENT
+	WHERE PROJECT_NO = #{projectNo}
+	ORDER BY PRESENT_NO
+</select>
+<select id="getProjectPresentsCount" resultType="present" parameterType="project">
+	SELECT COUNT(*) AS REWARD_SELECT_COUNT
+	FROM INVEST
+	WHERE PROJECT_NO = #{projectNo}
+	GROUP BY PRESENT_NO
+	ORDER BY PRESENT_NO
+</select>
+
+<!-- 관리자 픽 pick -->
+<select id="updatePick" statementType="CALLABLE" parameterType="project">
+	{CALL PICK_CONTROL (#{projectNo})}
+</select>
+
+
+
+
+
+</mapper>

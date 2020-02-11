@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration
+2.1//EN"
+"http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+	<definition name="mainTemplate"	template="/WEB-INF/views/tiles/layout.jsp">
+ 		<put-attribute name="header" value="/WEB-INF/views/tiles/header.jsp" />
+		<put-attribute name="content"	value="/WEB-INF/views/tiles/content.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/views/tiles/footer.jsp" />
+	</definition>
+	
+	<definition name="mainTemplateNav"  template="/WEB-INF/views/tiles/navLayout.jsp">
+ 		<put-attribute name="header" value="/WEB-INF/views/tiles/header.jsp" />
+ 		<put-attribute name="nav"	value="/WEB-INF/views/tiles/nav.jsp" />
+		<put-attribute name="content"	value="/WEB-INF/views/tiles/content.jsp" />
+		<put-attribute name="footer"  value="/WEB-INF/views/tiles/footer.jsp" /> 
+	</definition>
+	
+	<!-- 메인, 검색,로그인, 회원가입 , 프로제트 디테일  layout (네비게이션 없는 페이지) noNav-->
+	<definition name="noNav/*" extends="mainTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/{1}.jsp" />
+	</definition>
+	
+	<definition name="noNav/*/*" extends="mainTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp" />
+	</definition>
+	
+	<definition name="noNav/*/*/*" extends="mainTemplate">
+		<put-attribute name="content"
+			value="/WEB-INF/views/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	<!-- 관리자 layout 'adminNav' -->
+	<definition name="adminNav/*/*" extends="mainTemplateNav">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/tiles/nav/adminNav.jsp" />
+	</definition>
+	
+	<!-- 마이페이지 layout  'myNav' -->
+	<definition name="myNav/*/*" extends="mainTemplateNav">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/tiles/nav/mypageNav.jsp" />
+	</definition>
+	
+	<!-- 투자 layout 'investNav' -->
+	<definition name="investNav/*/*" extends="mainTemplateNav">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/tiles/nav/investNav.jsp" />
+	</definition>
+	
+	
+	<!-- 등록 layout 'rgNav' -->
+	<definition name="rgNav/*/*" extends="mainTemplateNav">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/tiles/nav/registerNav.jsp" />
+	</definition>
+	
+	<!-- alert 페이지  -->
+	 <definition name="/commons/*" >
+      <put-attribute name="body" value="/WEB-INF/Views/commons/alertRedirect.jsp" />
+    </definition>
+
+	<!-- ajax 페이지  -->
+	<definition name="ajax/*/*" template="/WEB-INF/views/tiles/blankLayout.jsp">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp" />
+	</definition>
+	
+	
+	
+	
+	
+</tiles-definitions>
